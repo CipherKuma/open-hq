@@ -1,0 +1,39 @@
+# Open HQ egress preset for the openhq-agents sandbox (NemoClaw custom preset format).
+# Apply:  nemohermes openhq-agents policy-add --from-file openhq-egress.yaml
+# Together with the base sandbox policy and the managed inference route (api.tokenfactory.nebius.com, key injected
+# at egress by OpenShell) this is the whole allowlist: Token Factory, the Open HQ MCP, Composio's MCP host. Nothing else.
+preset:
+  name: openhq-egress
+  description: "Open HQ MCP (openhq.pages.dev) and Composio MCP (mcp.composio.dev); Hermes only"
+
+network_policies:
+  openhq_mcp:
+    name: openhq_mcp
+    endpoints:
+      - host: openhq.pages.dev
+        port: 443
+        protocol: rest
+        enforcement: enforce
+        rules:
+          - allow: { method: POST, path: "/mcp" }
+          - allow: { method: GET, path: "/mcp" }
+          - allow: { method: DELETE, path: "/mcp" }
+    binaries:
+      - { path: /usr/local/bin/hermes }
+      - { path: /opt/hermes/.venv/bin/python* }
+      - { path: /usr/bin/python3* }
+  composio_mcp:
+    name: composio_mcp
+    endpoints:
+      - host: mcp.composio.dev
+        port: 443
+        access: full
+        tls: skip
+      - host: backend.composio.dev
+        port: 443
+        access: full
+        tls: skip
+    binaries:
+      - { path: /usr/local/bin/hermes }
+      - { path: /opt/hermes/.venv/bin/python* }
+      - { path: /usr/bin/python3* }

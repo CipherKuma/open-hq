@@ -1,0 +1,37 @@
+# Open HQ agent profile: ship. No secrets here; ${VAR} resolves from this profile's own .env.
+model:
+  default: nvidia/Nemotron-3.5-Super-VL
+  provider: custom
+  base_url: https://api.tokenfactory.nebius.com/v1
+  api_key: "${COMPATIBLE_API_KEY}"  # real key in plain Docker; an opaque placeholder inside OpenShell (injected at egress)
+agent:
+  max_turns: 12
+  # These agents act only through the Open HQ MCP tools (and read-only Composio): no shell, files, browser or code.
+  disabled_toolsets:
+    - terminal
+    - file
+    - browser
+    - code_execution
+    - computer_use
+    - image_gen
+    - vision
+    - tts
+    - delegation
+    - cronjob
+    - web
+
+mcp_servers:
+  openhq:
+    url: https://openhq.pages.dev/mcp
+    headers:
+      Authorization: "Bearer ${OPENHQ_MCP_TOKEN}"
+      x-openhq-agent: ship
+    timeout: 25
+  # Composio read-only MCP (per-agent allowlist). Disabled until COMPOSIO_MCP_URL / COMPOSIO_MCP_KEY are set in this profile's .env
+  # (values come from integrations.hermesMcpConfig('ship')); fill the two vars in ~/openhq/hermes.env, run hermes/box/render-env.sh, then set enabled: true
+  composio:
+    enabled: false
+    url: "${COMPOSIO_MCP_URL}"
+    headers:
+      x-api-key: "${COMPOSIO_MCP_KEY}"
+    timeout: 25

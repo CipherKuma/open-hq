@@ -5,7 +5,7 @@ compatibility_flags = ["nodejs_compat"]
 workers_dev = false
 
 [vars]
-AGENT_RUNTIME = "loop"          # "hermes" once the Hermes gateway is up; falls back to the loop after 25 s
+AGENT_RUNTIME = "hermes"          # "hermes" once the Hermes gateway is up; falls back to the loop after 25 s
 
 [triggers]
 crons = ["*/10 * * * *"]

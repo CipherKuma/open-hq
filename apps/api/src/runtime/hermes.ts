@@ -1,6 +1,7 @@
 // Hermes runtime: one POST per run to the Hermes Agent API server of the agent's profile.
-// HERMES_URL is the gateway edge (see hermes/README.md); each agent has its own route prefix:
-//   POST {HERMES_URL}/{agent}/v1/chat/completions   (Authorization: Bearer HERMES_KEY)
+// HERMES_URL is the gateway origin (see hermes/README.md). One Hermes gateway multiplexes the five profiles
+// and routes by path prefix, authenticating each profile with its own API_SERVER_KEY (the shared HERMES_KEY):
+//   POST {HERMES_URL}/p/{profile}/v1/chat/completions   (Authorization: Bearer HERMES_KEY)
 // Hermes runs the tool loop itself (Open HQ MCP + read-only Composio MCP), so the reply is the final text.
 // Any failure (not configured, timeout, non-2xx, malformed body) throws; the caller falls back to the loop runtime.
 import { z } from "zod";
@@ -16,7 +17,7 @@ interface HermesEnv {
   HERMES_KEY?: string;
 }
 
-// Agent id -> route prefix at the edge router, which maps it to that profile's API server port (8642-8646).
+// Agent id -> Hermes profile name (profiles are named exactly like the agent ids).
 export const HERMES_ROUTES: Record<AgentId, string> = {
   cos: "cos",
   revenue: "revenue",
@@ -50,7 +51,7 @@ export function hermesEndpoint(agent: AgentId, env: HermesEnv): { url: string; k
   const base = env.HERMES_URL?.trim().replace(/\/+$/, "");
   const key = env.HERMES_KEY?.trim();
   if (!base || !key) throw new HermesError("hermes not configured: HERMES_URL and HERMES_KEY are required");
-  return { url: `${base}/${HERMES_ROUTES[agent]}/v1/chat/completions`, key };
+  return { url: `${base}/p/${HERMES_ROUTES[agent]}/v1/chat/completions`, key };
 }
 
 // Run context the agent needs to use the Open HQ MCP tools correctly (which channel to post in, which run).

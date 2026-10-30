@@ -6,6 +6,7 @@ import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import type { Env } from "../env";
 import type { Trigger } from "../runtime/types";
+import { callReadTool, readToolsFor } from "../integrations";
 import { INTERNAL_TOOLS, callInternalTool, type ToolCtx } from "../tools/internal";
 import { bearerOk, uid } from "../util";
 
@@ -38,11 +39,21 @@ async function handle(env: Env, agent: AgentId, req: Request, msg: unknown): Pro
         instructions: "Open HQ tools for a founder's agents. You can only propose actions; the founder approves them.",
       });
     case "ping": return ok(id, {});
-    case "tools/list":
-      return ok(id, { tools: INTERNAL_TOOLS.map((t) => ({ name: t.name, description: t.description, inputSchema: zodToJsonSchema(t.schema, { target: "openApi3" }) })) });
+    case "tools/list": {
+      // Internal tools plus this agent's read-only connection tools (scoped and enforced by the integrations module).
+      const reads = await readToolsFor(agent, env).catch(() => []);
+      return ok(id, { tools: [
+        ...INTERNAL_TOOLS.map((t) => ({ name: t.name, description: t.description, inputSchema: zodToJsonSchema(t.schema, { target: "openApi3" }) })),
+        ...reads.map((t) => ({ name: t.function.name, description: t.function.description, inputSchema: t.function.parameters })),
+      ] });
+    }
     case "tools/call": {
       const name = typeof params?.name === "string" ? params.name : "";
-      if (!INTERNAL_TOOLS.some((t) => t.name === name)) return fail(id, -32602, `Unknown tool ${name}`);
+      if (!INTERNAL_TOOLS.some((t) => t.name === name)) {
+        const read = await callReadTool(agent, name, params?.arguments ?? {}, env).then((r) => ({ r }), (e: unknown) => ({ e: e instanceof Error ? e.message : "read failed" }));
+        if ("e" in read) return ok(id, { content: [{ type: "text", text: JSON.stringify({ error: read.e }) }], isError: true });
+        return ok(id, { content: [{ type: "text", text: JSON.stringify(read.r).slice(0, 60_000) }], isError: false });
+      }
       const result = await callInternalTool(await callerCtx(env, agent, req), name, params?.arguments ?? {});
       const isError = typeof result === "object" && result !== null && "error" in result;
       return ok(id, { content: [{ type: "text", text: JSON.stringify(result) }], isError });
