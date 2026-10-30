@@ -120,9 +120,10 @@ export function dueTasks(s: Schedule, now: Date): CronDecision[] {
   const tick = Math.floor(l.minutes / 10);
   const hour = Math.floor(l.minutes / 60);
   const within = (target: number) => l.minutes >= target && l.minutes < target + 10;
-  out.push({ key: `ship:${l.date}:${tick}`, task: "ship" });
-  if (l.minutes % 60 < 10) out.push({ key: `revenue:${l.date}:${hour}`, task: "revenue" });
-  if (l.minutes % 60 >= 30 && l.minutes % 60 < 40) out.push({ key: `support:${l.date}:${hour}`, task: "support" });
+  // Token Factory free tier: Ship every 2 h, Revenue and Support every 3 h (offset), not every tick.
+  if (l.minutes % 120 < 10) out.push({ key: `ship:${l.date}:${tick}`, task: "ship" });
+  if (l.minutes % 180 < 10) out.push({ key: `revenue:${l.date}:${hour}`, task: "revenue" });
+  if (l.minutes % 180 >= 90 && l.minutes % 180 < 100) out.push({ key: `support:${l.date}:${hour}`, task: "support" });
   if (within(6 * 60)) out.push({ key: `scout:${l.date}`, task: "scout" });
   if (within(12 * 60 + 30)) out.push({ key: `cos_midday:${l.date}`, task: "cos_midday" });
   if (within(23 * 60)) out.push({ key: `wrapup:${l.date}`, task: "wrapup" });

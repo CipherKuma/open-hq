@@ -1,0 +1,43 @@
+/* Open HQ evening palette: deep ink night, one warm lamp accent, five fixed agent identities. */
+:root {
+  color-scheme: dark;
+  --bg: #0F141C;
+  --bg-2: #121925;
+  --panel: #161E2B;
+  --panel-2: #1C2535;
+  --raise: #222D40;
+  --line: #263144;
+  --line-2: #31405A;
+  --fg: #E7EBF2;
+  --fg-2: #A9B4C6;
+  --fg-3: #75829A;
+  --lamp: #F0A64A;
+  --lamp-ink: #1A1206;
+  --lamp-soft: #3A2A14;
+  --lamp-glow: rgba(240, 166, 74, 0.12);
+  --ok: #5CC497;  --ok-bg: #15302A;
+  --warn: #E8B04F; --warn-bg: #36290F;
+  --bad: #F07A7A; --bad-bg: #3A1C20;
+  --info: #7FA2F0; --info-bg: #1A2744;
+
+  --a-cos: #F0A64A;
+  --a-revenue: #C29BF0;
+  --a-support: #7FA2F0;
+  --a-ship: #8BCB6B;
+  --a-scout: #62C6D8;
+  --a-you: #8D99AD;
+  --a-system: #5A6880;
+
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body: "IBM Plex Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --r-sm: 6px;
+  --r: 10px;
+  --r-lg: 14px;
+  --rail-w: 264px;
+  --topbar-h: 52px;
+  --bottombar-h: 60px;
+  --focus: 0 0 0 2px var(--bg), 0 0 0 4px var(--lamp);
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 12px 32px -18px rgba(0, 0, 0, 0.7);
+}
