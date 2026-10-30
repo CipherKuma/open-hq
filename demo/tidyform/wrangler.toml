@@ -1,0 +1,10 @@
+# Cloudflare Pages project "tidyform" (https://tidyform.pages.dev). The Worker code is bundled into
+# dist/_worker.js by deploy.mjs (advanced mode), which also bakes in the release label and the BREAK flag.
+name = "tidyform"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-05-01"
+
+# Secrets, set with `node deploy.mjs --secrets` (never committed):
+#   COMPOSIO_API_KEY  delivers the contact form to the support inbox through Composio Gmail
+#   SENTRY_DSN        optional, error reporting
+#   STRIPE_SECRET_KEY, STRIPE_PRICE_ID  optional, real sandbox Checkout

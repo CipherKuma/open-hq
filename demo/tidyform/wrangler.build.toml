@@ -1,0 +1,4 @@
+# Only used by deploy.mjs to bundle src/ into a single Worker file.
+name = "tidyform-build"
+main = "src/index.ts"
+compatibility_date = "2026-05-01"
