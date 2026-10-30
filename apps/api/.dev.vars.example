@@ -1,0 +1,7 @@
+NEBIUS_API_KEY=
+COMPOSIO_API_KEY=
+MCP_TOKEN=local-dev-token
+INGEST_SECRET=local-dev-secret
+# HERMES_URL=
+# HERMES_KEY=
+# AGENT_RUNTIME=loop

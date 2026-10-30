@@ -1,0 +1,39 @@
+name = "openhq-api"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = false
+
+[vars]
+AGENT_RUNTIME = "loop"          # "hermes" once the Hermes gateway is up; falls back to the loop after 25 s
+
+[triggers]
+crons = ["*/10 * * * *"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "openhq"
+database_id = "REPLACE_WITH_ID_FROM_wrangler_d1_create"   # see DEPLOY.md; local dev ignores it
+migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "RUNS"
+bucket_name = "openhq-runs"
+
+[[durable_objects.bindings]]
+name = "LIVE"
+class_name = "LiveHub"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["LiveHub"]
+
+[[workflows]]
+name = "openhq-workday"
+binding = "WORKDAY"
+class_name = "WorkdayWorkflow"
+
+[[workflows]]
+name = "openhq-agent-run"
+binding = "AGENT_RUN"
+class_name = "AgentRunWorkflow"
