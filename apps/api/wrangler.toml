@@ -13,7 +13,7 @@ crons = ["*/10 * * * *"]
 [[d1_databases]]
 binding = "DB"
 database_name = "openhq"
-database_id = "REPLACE_WITH_ID_FROM_wrangler_d1_create"   # see DEPLOY.md; local dev ignores it
+database_id = "e25b21eb-585c-46e1-849d-c94e4348965d"   # see DEPLOY.md; local dev ignores it
 migrations_dir = "migrations"
 
 [[r2_buckets]]
