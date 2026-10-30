@@ -7,6 +7,7 @@ import { zodToJsonSchema } from "zod-to-json-schema";
 import type { Env } from "../env";
 import type { Trigger } from "../runtime/types";
 import { callReadTool, readToolsFor } from "../integrations";
+import { logActivity } from "../store/activity";
 import { INTERNAL_TOOLS, callInternalTool, type ToolCtx } from "../tools/internal";
 import { bearerOk, uid } from "../util";
 
@@ -49,13 +50,21 @@ async function handle(env: Env, agent: AgentId, req: Request, msg: unknown): Pro
     }
     case "tools/call": {
       const name = typeof params?.name === "string" ? params.name : "";
+      const started = Date.now();
+      const ctx = await callerCtx(env, agent, req);
+      const log = (isError: boolean) => logActivity(env, {
+        agent, kind: "tool_call", runtime: "hermes", ms: Date.now() - started, runId: ctx.runId,
+        summary: `${name}${isError ? " (error)" : ""}`, detail: JSON.stringify(params?.arguments ?? {}).slice(0, 600),
+      }).catch(() => undefined);
       if (!INTERNAL_TOOLS.some((t) => t.name === name)) {
         const read = await callReadTool(agent, name, params?.arguments ?? {}, env).then((r) => ({ r }), (e: unknown) => ({ e: e instanceof Error ? e.message : "read failed" }));
+        await log("e" in read);
         if ("e" in read) return ok(id, { content: [{ type: "text", text: JSON.stringify({ error: read.e }) }], isError: true });
         return ok(id, { content: [{ type: "text", text: JSON.stringify(read.r).slice(0, 60_000) }], isError: false });
       }
-      const result = await callInternalTool(await callerCtx(env, agent, req), name, params?.arguments ?? {});
+      const result = await callInternalTool(ctx, name, params?.arguments ?? {});
       const isError = typeof result === "object" && result !== null && "error" in result;
+      await log(isError);
       return ok(id, { content: [{ type: "text", text: JSON.stringify(result) }], isError });
     }
     default: return fail(id, -32601, `Method not found: ${method}`);

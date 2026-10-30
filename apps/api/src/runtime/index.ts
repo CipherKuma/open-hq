@@ -1,4 +1,4 @@
-// Runtime selector: Hermes when AGENT_RUNTIME=hermes (25 s timeout, then fall back to the loop), otherwise the loop.
+// Runtime selector: Hermes when AGENT_RUNTIME=hermes (50 s timeout, then fall back to the loop), otherwise the loop.
 // Also owns the per-run bookkeeping: agent_runs row, agent_status broadcasts, activity for Hermes runs, R2 run log.
 import { broadcast } from "../live";
 import type { Env } from "../env";
@@ -10,7 +10,7 @@ import { hermesRuntime } from "./hermes";
 import { loopRuntime } from "./loop";
 import type { AgentRuntime, RunInput, RunResult } from "./types";
 
-export const HERMES_TIMEOUT_MS = 25_000;
+export const HERMES_TIMEOUT_MS = 50_000;
 
 function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
   return new Promise((resolve, reject) => {

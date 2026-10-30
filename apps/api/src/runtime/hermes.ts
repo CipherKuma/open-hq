@@ -10,7 +10,7 @@ import { modelFor } from "../models";
 import { clip, errMessage } from "../util";
 import type { AgentRuntime, RunInput, RunResult } from "./types";
 
-export const HERMES_TIMEOUT_MS = 25_000;
+export const HERMES_TIMEOUT_MS = 50_000;
 
 interface HermesEnv {
   HERMES_URL?: string;
